@@ -24,6 +24,8 @@
     <div class="big">✅</div>
     <h2>You've already voted from this device</h2>
     <p id="already-voted-detail"></p>
+    <p style="font-size:13px;color:var(--stump-tan);">Not counted, or picked wrong? You can vote again.</p>
+    <button type="button" id="revote-btn">Vote Again</button>
   </div>
 
   <form id="poll-form" class="card">
@@ -53,7 +55,9 @@
 <script src="assets/players.js"></script>
 <script src="assets/config.js"></script>
 <script>
-const STORAGE_KEY = "captainPollVote";
+// v2: bumped when the live sheet was connected, so pre-connection local-only
+// votes no longer block people from voting into the real sheet.
+const STORAGE_KEY = "captainPollVote_v2";
 
 const voterSelect = document.getElementById("voter");
 const picksContainer = document.getElementById("picks");
@@ -110,6 +114,12 @@ if (existing) {
   alreadyVotedBox.style.display = "block";
   alreadyVotedDetail.textContent = `${vote.voter} voted for ${vote.pick1} and ${vote.pick2}.`;
 }
+
+document.getElementById("revote-btn").addEventListener("click", () => {
+  localStorage.removeItem(STORAGE_KEY);
+  alreadyVotedBox.style.display = "none";
+  form.style.display = "block";
+});
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
