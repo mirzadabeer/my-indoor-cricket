@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Poll — Muweilah Friendly XI</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="eyebrow">Muweilah Friendly XI</p>
+    <h1>Vote for 2 Captains</h1>
+    <p>Pick who you are, then choose exactly 2 players you'd like as captains.</p>
+  </div>
+
+  <div id="setup-banner" class="banner" style="display:none;">
+    Live sync to the sheet isn't configured yet — your vote will be saved on this device only.
+    Ask Dabeer to finish the Apps Script setup (see apps-script/README.md in the repo).
+  </div>
+
+  <div id="already-voted" class="card confirm" style="display:none;">
+    <div class="big">✅</div>
+    <h2>You've already voted from this device</h2>
+    <p id="already-voted-detail"></p>
+  </div>
+
+  <form id="poll-form" class="card">
+    <h2>1. Who are you?</h2>
+    <select id="voter" required>
+      <option value="" disabled selected>Select your name</option>
+    </select>
+
+    <h2>2. Pick exactly 2 captains</h2>
+    <div id="picks" class="checkbox-grid"></div>
+
+    <button type="submit" id="submit-btn" disabled>Submit Vote</button>
+  </form>
+
+  <div id="confirm" class="card confirm" style="display:none;">
+    <div class="big">🏏</div>
+    <h2>Vote recorded</h2>
+    <p id="confirm-detail"></p>
+    <a class="button" href="results.html">See Live Results</a>
+  </div>
+
+  <div class="nav-links">
+    <a class="button" href="index.html">Home</a>
+  </div>
+</div>
+
+<script src="assets/players.js"></script>
+<script src="assets/config.js"></script>
+<script>
+const STORAGE_KEY = "captainPollVote";
+
+const voterSelect = document.getElementById("voter");
+const picksContainer = document.getElementById("picks");
+const submitBtn = document.getElementById("submit-btn");
+const form = document.getElementById("poll-form");
+const confirmBox = document.getElementById("confirm");
+const confirmDetail = document.getElementById("confirm-detail");
+const alreadyVotedBox = document.getElementById("already-voted");
+const alreadyVotedDetail = document.getElementById("already-voted-detail");
+const setupBanner = document.getElementById("setup-banner");
+
+if (!APPS_SCRIPT_URL) setupBanner.style.display = "block";
+
+PLAYERS.forEach((name) => {
+  const opt = document.createElement("option");
+  opt.value = name;
+  opt.textContent = name;
+  voterSelect.appendChild(opt);
+});
+
+PLAYERS.forEach((name) => {
+  const label = document.createElement("label");
+  label.innerHTML = `<input type="checkbox" value="${name}"> ${name}`;
+  picksContainer.appendChild(label);
+});
+
+const checkboxes = () => Array.from(picksContainer.querySelectorAll("input[type=checkbox]"));
+
+function updatePicksState() {
+  const checked = checkboxes().filter((c) => c.checked);
+  checkboxes().forEach((c) => {
+    const label = c.closest("label");
+    if (checked.length >= 2 && !c.checked) {
+      c.disabled = true;
+      label.classList.add("disabled");
+    } else {
+      c.disabled = false;
+      label.classList.remove("disabled");
+    }
+  });
+  submitBtn.disabled = !(voterSelect.value && checked.length === 2);
+}
+
+picksContainer.addEventListener("change", updatePicksState);
+voterSelect.addEventListener("change", updatePicksState);
+
+const existing = localStorage.getItem(STORAGE_KEY);
+if (existing) {
+  const vote = JSON.parse(existing);
+  form.style.display = "none";
+  alreadyVotedBox.style.display = "block";
+  alreadyVotedDetail.textContent = `${vote.voter} voted for ${vote.pick1} and ${vote.pick2}.`;
+}
+
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const checked = checkboxes().filter((c) => c.checked).map((c) => c.value);
+  const vote = {
+    voter: voterSelect.value,
+    pick1: checked[0],
+    pick2: checked[1],
+    timestamp: new Date().toISOString(),
+  };
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(vote));
+
+  if (APPS_SCRIPT_URL) {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(vote),
+      });
+    } catch (err) {
+      // no-cors fetch failures are silent by design; local copy is already saved
+    }
+  }
+
+  form.style.display = "none";
+  confirmBox.style.display = "block";
+  confirmDetail.textContent = `${vote.voter}, your vote for ${vote.pick1} and ${vote.pick2} is in.`;
+});
+</script>
+</body>
+</html>

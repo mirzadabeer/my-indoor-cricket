@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Poll Results — Muweilah Friendly XI</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="eyebrow">Muweilah Friendly XI</p>
+    <h1>Live Captain Poll Results</h1>
+    <p id="status">Loading...</p>
+  </div>
+
+  <div id="results-card" class="card" style="display:none;">
+    <h2>Votes so far</h2>
+    <div id="results"></div>
+  </div>
+
+  <div class="nav-links">
+    <a class="button" href="captain-poll.html">Vote</a>
+    <a class="button" href="index.html">Home</a>
+  </div>
+</div>
+
+<script src="assets/players.js"></script>
+<script src="assets/config.js"></script>
+<script>
+const status = document.getElementById("status");
+const resultsCard = document.getElementById("results-card");
+const resultsDiv = document.getElementById("results");
+
+function renderTally(votes) {
+  const tally = {};
+  PLAYERS.forEach((p) => (tally[p] = 0));
+  votes.forEach((v) => {
+    if (tally[v.pick1] !== undefined) tally[v.pick1]++;
+    if (tally[v.pick2] !== undefined) tally[v.pick2]++;
+  });
+
+  const max = Math.max(1, ...Object.values(tally));
+  const sorted = Object.entries(tally).sort((a, b) => b[1] - a[1]);
+
+  resultsDiv.innerHTML = "";
+  sorted.forEach(([name, count]) => {
+    const row = document.createElement("div");
+    row.className = "result-row";
+    row.innerHTML = `
+      <div class="result-name">${name}</div>
+      <div class="result-bar-track"><div class="result-bar" style="width:${(count / max) * 100}%"></div></div>
+      <div class="result-count">${count}</div>
+    `;
+    resultsDiv.appendChild(row);
+  });
+
+  resultsCard.style.display = "block";
+  status.textContent = `${votes.length} of ${PLAYERS.length} players have voted.`;
+}
+
+async function load() {
+  if (!APPS_SCRIPT_URL) {
+    status.textContent = "Live sync isn't configured yet. Showing only this device's local vote (if any).";
+    const local = localStorage.getItem("captainPollVote");
+    renderTally(local ? [JSON.parse(local)] : []);
+    return;
+  }
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const votes = await res.json();
+    renderTally(votes);
+  } catch (err) {
+    status.textContent = "Couldn't reach the results sheet. Check back in a moment.";
+  }
+}
+
+load();
+</script>
+</body>
+</html>
