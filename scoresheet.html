@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Printable Scoresheet — Match 2</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --line: #333;
+    --soft: #666;
+    --band: #eceae2;
+    --eagle: #2c5f8a;
+    --striker: #b3402a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: #d9d7cf;
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    padding: 20px;
+  }
+  .sheet {
+    background: #fff;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 26px 30px 34px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 3px solid var(--ink);
+    padding-bottom: 10px;
+    margin-bottom: 6px;
+  }
+  .head h1 {
+    font-size: 22px;
+    margin: 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .head .meta { font-size: 12px; color: var(--soft); text-align: right; line-height: 1.5; }
+  .fillrow { display: flex; gap: 24px; font-size: 12px; margin: 12px 0 20px; }
+  .fillrow .f { flex: 1; border-bottom: 1px solid var(--line); padding-bottom: 3px; }
+  .fillrow .f small { color: var(--soft); text-transform: uppercase; letter-spacing: 0.08em; font-size: 10px; }
+
+  .team-block { margin-bottom: 24px; page-break-inside: avoid; }
+  .team-title {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 10px;
+    color: #fff;
+    margin-bottom: 0;
+  }
+  .team-title.eagles { background: var(--eagle); }
+  .team-title.strikers { background: var(--striker); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { border: 1px solid var(--line); padding: 0; height: 30px; text-align: left; }
+  th {
+    background: var(--band);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 8px;
+    text-align: center;
+  }
+  td.name { padding: 0 10px; font-weight: 600; width: 34%; }
+  td.tally { width: 40%; }
+  td.num { text-align: center; width: 13%; }
+  tr.total td { background: var(--band); font-weight: 700; }
+  tr.total td.name { text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; }
+
+  .awards {
+    margin-top: 18px;
+    border: 2px dashed var(--line);
+    padding: 12px 14px;
+    page-break-inside: avoid;
+  }
+  .awards h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; margin: 0 0 10px; }
+  .awards .arow { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; font-size: 13px; }
+  .awards .arow:last-child { margin-bottom: 0; }
+  .awards .alabel { width: 150px; font-weight: 700; }
+  .awards .aline { flex: 1; border-bottom: 1px solid var(--line); height: 20px; }
+
+  .toolbar { max-width: 800px; margin: 0 auto 16px; display: flex; gap: 10px; }
+  .toolbar button, .toolbar a {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 3px;
+    background: #1f3d2e;
+    color: #f5f1e6;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .note { max-width: 800px; margin: 10px auto 0; font-size: 12px; color: #555; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .sheet { box-shadow: none; max-width: 100%; padding: 0; }
+    .toolbar, .note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="toolbar">
+  <button onclick="window.print()">🖨️ Print / Save PDF</button>
+  <a href="index.html">Home</a>
+</div>
+
+<div class="sheet">
+  <div class="head">
+    <div>
+      <h1>Match Scoresheet</h1>
+      <div style="font-size:12px;color:var(--soft);">Arabian Eagles 🦅 vs Desert Strikers ⚡</div>
+    </div>
+    <div class="meta">
+      Muweilah Friendly XI · Match 2<br>
+      Sat 18 July · 9:00–11:00 PM<br>
+      Saed Sports, Safari Mall
+    </div>
+  </div>
+
+  <div class="fillrow">
+    <div class="f"><small>Game #</small></div>
+    <div class="f"><small>Toss won by</small></div>
+    <div class="f"><small>Scorer</small></div>
+  </div>
+
+  <!-- EAGLES -->
+  <div class="team-block">
+    <div class="team-title eagles">🦅 Arabian Eagles — Batting & Bowling</div>
+    <table>
+      <thead>
+        <tr><th style="text-align:left;padding-left:10px;">Player</th><th>Runs (tally)</th><th>Runs</th><th>Wkts Taken</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name">Zeeshan Bhaiya (C)</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Ali</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Jaffar</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Farhan</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Saqlain Hyder</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Razu</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Villu</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr class="total"><td class="name">Total</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- STRIKERS -->
+  <div class="team-block">
+    <div class="team-title strikers">⚡ Desert Strikers — Batting & Bowling</div>
+    <table>
+      <thead>
+        <tr><th style="text-align:left;padding-left:10px;">Player</th><th>Runs (tally)</th><th>Runs</th><th>Wkts Taken</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="name">Hyder (C)</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Dabeer</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Mohd Ali</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Vaseem Bhaiya</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Anush</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Taher Bhaiya</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr><td class="name">Saqlain Roushan</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+        <tr class="total"><td class="name">Total</td><td class="tally"></td><td class="num"></td><td class="num"></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="awards">
+    <h2>🏆 Tournament Awards</h2>
+    <div class="arow"><span class="alabel">🏏 Best Batsman</span><span class="aline"></span></div>
+    <div class="arow"><span class="alabel">🎯 Best Bowler</span><span class="aline"></span></div>
+    <div class="arow"><span class="alabel">⭐ Man of the Match</span><span class="aline"></span></div>
+  </div>
+</div>
+
+<p class="note">Tip: Print two copies (one per game), or tap "Save PDF" and fill it on your phone. Tally each run with a stroke in the Runs column, then write the total.</p>
+</body>
+</html>

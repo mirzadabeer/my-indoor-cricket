@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournament Awards — Match 2</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .award-card { text-align: center; padding-top: 22px; }
+  .award-icon { font-size: 46px; line-height: 1; }
+  .award-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 8px 0 4px;
+  }
+  .award-name {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+    min-height: 30px;
+    color: var(--crease-white);
+  }
+  .award-name.empty { color: rgba(245,241,230,0.3); font-size: 18px; }
+  .award-team { font-family: var(--font-mono); font-size: 12px; color: var(--stump-tan); margin-top: 4px; min-height: 16px; }
+
+  .edit-grid { display: grid; gap: 10px; margin-bottom: 8px; }
+  .edit-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: center; }
+  .edit-row .lbl {
+    grid-column: 1 / -1;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-top: 4px;
+  }
+  .edit-row input, .edit-row select {
+    padding: 10px;
+    font-size: 15px;
+    background: var(--pitch-green-deep);
+    color: var(--crease-white);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-family: var(--font-body);
+  }
+  .toggle-btn { margin-top: 6px; }
+  #editor { display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="eyebrow">Muweilah Friendly XI · Match 2</p>
+    <h1>Tournament Awards 🏆</h1>
+    <p class="match-tag">Arabian Eagles 🦅 vs Desert Strikers ⚡ · Sat 18 July</p>
+  </div>
+
+  <div class="card award-card">
+    <div class="award-icon">🏏</div>
+    <div class="award-title">Best Batsman</div>
+    <div class="award-name empty" id="bat-name">To be announced</div>
+    <div class="award-team" id="bat-team"></div>
+  </div>
+
+  <div class="card award-card">
+    <div class="award-icon">🎯</div>
+    <div class="award-title">Best Bowler</div>
+    <div class="award-name empty" id="bowl-name">To be announced</div>
+    <div class="award-team" id="bowl-team"></div>
+  </div>
+
+  <div class="card award-card">
+    <div class="award-icon">⭐</div>
+    <div class="award-title">Man of the Match</div>
+    <div class="award-name empty" id="motm-name">To be announced</div>
+    <div class="award-team" id="motm-team"></div>
+  </div>
+
+  <button type="button" id="toggle-edit" class="toggle-btn">✏️ Set / Edit Winners</button>
+
+  <div class="card" id="editor">
+    <div class="edit-grid">
+      <div class="edit-row">
+        <span class="lbl">🏏 Best Batsman</span>
+        <select id="bat-select"></select>
+        <input type="text" id="bat-note" placeholder="Note (e.g. 42 runs)">
+      </div>
+      <div class="edit-row">
+        <span class="lbl">🎯 Best Bowler</span>
+        <select id="bowl-select"></select>
+        <input type="text" id="bowl-note" placeholder="Note (e.g. 4 wickets)">
+      </div>
+      <div class="edit-row">
+        <span class="lbl">⭐ Man of the Match</span>
+        <select id="motm-select"></select>
+        <input type="text" id="motm-note" placeholder="Note (optional)">
+      </div>
+    </div>
+    <button type="button" id="save-awards">Save & Announce</button>
+  </div>
+
+  <div class="nav-links" style="margin-top:8px;">
+    <button type="button" id="copy-awards" style="border:1px solid var(--gold);background:none;color:var(--gold);">Copy for WhatsApp</button>
+  </div>
+  <p id="copy-status" style="font-family:var(--font-mono);font-size:12px;color:var(--stump-tan);min-height:16px;"></p>
+
+  <div class="nav-links">
+    <a class="button" href="scorecard.html">Scorecard</a>
+    <a class="button" href="index.html">Home</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "tournamentAwards";
+const ROSTER = {
+  "Arabian Eagles": ["Zeeshan Bhaiya", "Ali", "Jaffar", "Farhan", "Saqlain Hyder", "Razu", "Villu"],
+  "Desert Strikers": ["Hyder", "Dabeer", "Mohd Ali", "Vaseem Bhaiya", "Anush", "Taher Bhaiya", "Saqlain Roushan"],
+};
+const PLAYER_TEAM = {};
+Object.entries(ROSTER).forEach(([team, players]) => players.forEach((p) => (PLAYER_TEAM[p] = team)));
+
+const AWARDS = [
+  { key: "bat", label: "Best Batsman", icon: "🏏" },
+  { key: "bowl", label: "Best Bowler", icon: "🎯" },
+  { key: "motm", label: "Man of the Match", icon: "⭐" },
+];
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
+  catch { return {}; }
+}
+let data = load();
+
+// Populate dropdowns
+AWARDS.forEach((a) => {
+  const sel = document.getElementById(a.key + "-select");
+  sel.innerHTML = '<option value="">— select player —</option>';
+  Object.entries(ROSTER).forEach(([team, players]) => {
+    const group = document.createElement("optgroup");
+    group.label = team;
+    players.forEach((p) => {
+      const opt = document.createElement("option");
+      opt.value = p; opt.textContent = p;
+      group.appendChild(opt);
+    });
+    sel.appendChild(group);
+  });
+  if (data[a.key]) sel.value = data[a.key].name || "";
+  const note = document.getElementById(a.key + "-note");
+  if (data[a.key]) note.value = data[a.key].note || "";
+});
+
+function render() {
+  AWARDS.forEach((a) => {
+    const nameEl = document.getElementById(a.key + "-name");
+    const teamEl = document.getElementById(a.key + "-team");
+    const rec = data[a.key];
+    if (rec && rec.name) {
+      nameEl.textContent = rec.name;
+      nameEl.classList.remove("empty");
+      const team = PLAYER_TEAM[rec.name] || "";
+      teamEl.textContent = [team, rec.note].filter(Boolean).join(" · ");
+    } else {
+      nameEl.textContent = "To be announced";
+      nameEl.classList.add("empty");
+      teamEl.textContent = "";
+    }
+  });
+}
+
+document.getElementById("toggle-edit").addEventListener("click", () => {
+  const ed = document.getElementById("editor");
+  ed.style.display = ed.style.display === "block" ? "none" : "block";
+});
+
+document.getElementById("save-awards").addEventListener("click", () => {
+  AWARDS.forEach((a) => {
+    const name = document.getElementById(a.key + "-select").value;
+    const note = document.getElementById(a.key + "-note").value.trim();
+    data[a.key] = { name, note };
+  });
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  render();
+  document.getElementById("editor").style.display = "none";
+});
+
+document.getElementById("copy-awards").addEventListener("click", async () => {
+  const lines = ["🏆 TOURNAMENT AWARDS — Match 2", "🦅 Arabian Eagles vs Desert Strikers ⚡", ""];
+  AWARDS.forEach((a) => {
+    const rec = data[a.key];
+    if (rec && rec.name) {
+      const team = PLAYER_TEAM[rec.name] || "";
+      lines.push(`${a.icon} ${a.label}: ${rec.name}${rec.note ? " (" + rec.note + ")" : ""}${team ? " — " + team : ""}`);
+    } else {
+      lines.push(`${a.icon} ${a.label}: —`);
+    }
+  });
+  lines.push("", "Well played everyone! 🏏🔥");
+  try { await navigator.clipboard.writeText(lines.join("\n")); } catch {}
+  document.getElementById("copy-status").textContent = "Awards copied — paste in the group ✅";
+  setTimeout(() => { document.getElementById("copy-status").textContent = ""; }, 3000);
+});
+
+render();
+</script>
+</body>
+</html>
