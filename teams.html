@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Final Teams — Muweilah Friendly XI</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .captains {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .captain-box {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 14px;
+    text-align: center;
+  }
+  .captain-box .rank {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  .captain-box .name {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 18px;
+    margin-top: 4px;
+  }
+  .captain-box .votes {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--stump-tan);
+  }
+  .teams { display: grid; gap: 16px; }
+  @media (min-width: 600px) { .teams { grid-template-columns: 1fr 1fr; } }
+  .team h2 { display: flex; align-items: center; gap: 8px; }
+  .team-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .dot-a { background: #4a7ba6; }
+  .dot-b { background: var(--ball-red); }
+  .roster { list-style: none; padding: 0; margin: 0; }
+  .roster li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .roster li:last-child { border-bottom: none; }
+  .roster .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--stump-tan);
+    width: 18px;
+    flex-shrink: 0;
+  }
+  .cap-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    background: var(--gold);
+    color: var(--pitch-green-deep);
+    padding: 1px 6px;
+    border-radius: 2px;
+    margin-left: auto;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="eyebrow">Muweilah Friendly XI · Match 2</p>
+    <h1>Final Teams</h1>
+    <p class="match-tag">Fri 18 July · 9:00–11:00 PM · Saed Sports, Safari Mall, Muweilah</p>
+    <p>Captains voted by the group (14 votes), teams balanced for a fair game.</p>
+  </div>
+
+  <div class="card">
+    <h2>Captains</h2>
+    <div class="captains">
+      <div class="captain-box">
+        <div class="rank">🥇 Top Voted</div>
+        <div class="name">Zeeshan Bhaiya</div>
+        <div class="votes">9 votes</div>
+      </div>
+      <div class="captain-box">
+        <div class="rank">🥈 Captain 2</div>
+        <div class="name">Hyder</div>
+        <div class="votes">4 votes</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="teams">
+    <div class="card team">
+      <h2><span class="team-dot dot-a"></span> Team A</h2>
+      <ul class="roster">
+        <li><span class="num">1</span> Zeeshan Bhaiya <span class="cap-tag">CAPTAIN</span></li>
+        <li><span class="num">2</span> Taher Bhaiya</li>
+        <li><span class="num">3</span> Jaffar</li>
+        <li><span class="num">4</span> Farhan</li>
+        <li><span class="num">5</span> Saqlain Hyder</li>
+        <li><span class="num">6</span> Razu</li>
+        <li><span class="num">7</span> Villu</li>
+      </ul>
+    </div>
+
+    <div class="card team">
+      <h2><span class="team-dot dot-b"></span> Team B</h2>
+      <ul class="roster">
+        <li><span class="num">1</span> Hyder <span class="cap-tag">CAPTAIN</span></li>
+        <li><span class="num">2</span> Dabeer</li>
+        <li><span class="num">3</span> Mohd Ali</li>
+        <li><span class="num">4</span> Vaseem Bhaiya</li>
+        <li><span class="num">5</span> Anush</li>
+        <li><span class="num">6</span> Ali</li>
+        <li><span class="num">7</span> Saqlain Roushan</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="nav-links">
+    <a class="button" href="results.html">Poll Results</a>
+    <a class="button" href="index.html">Home</a>
+  </div>
+</div>
+</body>
+</html>
