@@ -13,7 +13,11 @@
     --eagle: #2c5f8a;
     --striker: #b3402a;
   }
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
   body {
     margin: 0;
     background: #d9d7cf;
@@ -109,9 +113,12 @@
   .note { max-width: 800px; margin: 10px auto 0; font-size: 12px; color: #555; }
 
   @media print {
-    body { background: #fff; padding: 0; }
+    body { background: #fff; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .sheet { box-shadow: none; max-width: 100%; padding: 0; }
     .toolbar, .note { display: none; }
+    .team-title.eagles { background: var(--eagle) !important; color: #fff !important; }
+    .team-title.strikers { background: var(--striker) !important; color: #fff !important; }
+    th, tr.total td { background: var(--band) !important; }
   }
 </style>
 </head>
