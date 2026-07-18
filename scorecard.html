@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scorecard — Arabian Eagles vs Desert Strikers</title>
+<link rel="stylesheet" href="assets/style.css">
+<style>
+  .matchup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 18px;
+    margin: 6px 0 2px;
+    flex-wrap: wrap;
+  }
+  .matchup .vs { color: var(--gold); font-size: 13px; }
+  .team-a-name { color: #7fb0d8; }
+  .team-b-name { color: #e08a72; }
+
+  .series-banner {
+    text-align: center;
+    padding: 6px 0 2px;
+  }
+  .series-score {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+  }
+  .series-verdict {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    margin-top: 6px;
+    min-height: 20px;
+  }
+
+  .game { padding-top: 6px; }
+  .game-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .game-head h2 { margin: 0; }
+  .game-remove {
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--stump-tan);
+    font-size: 11px;
+    padding: 4px 10px;
+    letter-spacing: 0.08em;
+  }
+
+  .score-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .score-row .team-label {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.03em;
+  }
+  .score-inputs { display: flex; align-items: center; gap: 4px; }
+  .score-inputs input {
+    width: 52px;
+    padding: 8px 6px;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    background: var(--pitch-green-deep);
+    color: var(--crease-white);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    font-variant-numeric: tabular-nums;
+  }
+  .score-inputs .sep { color: var(--stump-tan); font-family: var(--font-mono); }
+  .score-inputs .overs { width: 46px; }
+  .mini-label {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--stump-tan);
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 3px;
+  }
+  .col-heads {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 8px;
+    margin-bottom: 2px;
+  }
+  .col-heads span { text-align: center; }
+  .col-heads .spacer { }
+
+  .game-result {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--stump-tan);
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+    margin-top: 4px;
+    min-height: 16px;
+  }
+  .game-result.win { color: var(--crease-white); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+  }
+  #copy-status {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--stump-tan);
+    margin-top: 10px;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <p class="eyebrow">Muweilah Friendly XI · Match 2</p>
+    <h1>Live Scorecard</h1>
+    <p class="matchup">
+      <span class="team-a-name">🦅 Arabian Eagles</span>
+      <span class="vs">vs</span>
+      <span class="team-b-name">Desert Strikers ⚡</span>
+    </p>
+    <p class="match-tag">Sat 18 July · 9:00–11:00 PM · Saed Sports, Safari Mall, Muweilah</p>
+  </div>
+
+  <div class="card">
+    <div class="series-banner">
+      <div class="series-score" id="series-score">0 – 0</div>
+      <div class="series-verdict" id="series-verdict">Enter scores below</div>
+    </div>
+  </div>
+
+  <div id="games"></div>
+
+  <div class="actions">
+    <button type="button" id="add-game">+ Add Game</button>
+    <button type="button" id="copy-result" class="btn-ghost">Copy Result for WhatsApp</button>
+    <button type="button" id="reset-all" class="game-remove">Reset All</button>
+  </div>
+  <p id="copy-status"></p>
+
+  <div class="nav-links" style="margin-top:20px;">
+    <a class="button" href="teams.html">Teams</a>
+    <a class="button" href="index.html">Home</a>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = "scorecardMatch2";
+const TEAM_A = "Arabian Eagles";
+const TEAM_B = "Desert Strikers";
+const gamesEl = document.getElementById("games");
+
+let games = load();
+if (games.length === 0) games = [blankGame()];
+
+function blankGame() { return { eR: "", eW: "", eO: "", sR: "", sW: "", sO: "" }; }
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(games)); }
+
+function gameResultText(g) {
+  const eR = g.eR === "" ? null : Number(g.eR);
+  const sR = g.sR === "" ? null : Number(g.sR);
+  if (eR === null || sR === null) return { text: "Enter both scores to see the result", win: false, winner: null };
+  if (eR === sR) return { text: `Match tied at ${eR}`, win: true, winner: "tie" };
+  const winner = eR > sR ? TEAM_A : TEAM_B;
+  const margin = Math.abs(eR - sR);
+  return { text: `${winner} won by ${margin} run${margin === 1 ? "" : "s"}`, win: true, winner };
+}
+
+function render() {
+  gamesEl.innerHTML = "";
+  games.forEach((g, i) => {
+    const res = gameResultText(g);
+    const card = document.createElement("div");
+    card.className = "card game";
+    card.innerHTML = `
+      <div class="game-head">
+        <h2>Game ${i + 1}</h2>
+        ${games.length > 1 ? `<button type="button" class="game-remove" data-remove="${i}">Remove</button>` : ""}
+      </div>
+      <div class="col-heads">
+        <span class="spacer"></span>
+        <span class="mini-label">Runs</span>
+        <span class="mini-label">Wkts</span>
+        <span class="mini-label">Overs</span>
+      </div>
+      <div class="score-row">
+        <span class="team-label team-a-name">🦅 Eagles</span>
+        <input type="number" inputmode="numeric" min="0" data-g="${i}" data-f="eR" value="${g.eR}" aria-label="Eagles runs">
+        <input type="number" inputmode="numeric" min="0" max="11" data-g="${i}" data-f="eW" value="${g.eW}" aria-label="Eagles wickets">
+        <input type="number" inputmode="decimal" min="0" class="overs" data-g="${i}" data-f="eO" value="${g.eO}" aria-label="Eagles overs">
+      </div>
+      <div class="score-row">
+        <span class="team-label team-b-name">⚡ Strikers</span>
+        <input type="number" inputmode="numeric" min="0" data-g="${i}" data-f="sR" value="${g.sR}" aria-label="Strikers runs">
+        <input type="number" inputmode="numeric" min="0" max="11" data-g="${i}" data-f="sW" value="${g.sW}" aria-label="Strikers wickets">
+        <input type="number" inputmode="decimal" min="0" class="overs" data-g="${i}" data-f="sO" value="${g.sO}" aria-label="Strikers overs">
+      </div>
+      <div class="game-result ${res.win ? "win" : ""}">${res.text}</div>
+    `;
+    gamesEl.appendChild(card);
+  });
+  renderSeries();
+}
+
+function renderSeries() {
+  let a = 0, b = 0, ties = 0, decided = 0;
+  games.forEach((g) => {
+    const res = gameResultText(g);
+    if (!res.win) return;
+    decided++;
+    if (res.winner === TEAM_A) a++;
+    else if (res.winner === TEAM_B) b++;
+    else ties++;
+  });
+  document.getElementById("series-score").textContent = `${a} – ${b}`;
+  const verdict = document.getElementById("series-verdict");
+  if (decided === 0) { verdict.textContent = "Enter scores below"; return; }
+  const need = Math.floor(games.length / 2) + 1;
+  if (a > b && a >= need && games.length > 1) verdict.textContent = `🏆 ${TEAM_A} win the series!`;
+  else if (b > a && b >= need && games.length > 1) verdict.textContent = `🏆 ${TEAM_B} win the series!`;
+  else if (games.length === 1) {
+    const res = gameResultText(games[0]);
+    verdict.textContent = res.winner === "tie" ? "🤝 Match tied" : `🏆 ${res.winner} win!`;
+  } else if (a === b) verdict.textContent = `Series level${ties ? ` (${ties} tied)` : ""}`;
+  else verdict.textContent = `${a > b ? TEAM_A : TEAM_B} lead ${Math.max(a,b)}–${Math.min(a,b)}`;
+}
+
+gamesEl.addEventListener("input", (e) => {
+  const inp = e.target;
+  if (inp.dataset.g === undefined) return;
+  games[Number(inp.dataset.g)][inp.dataset.f] = inp.value;
+  save();
+  // update just the affected game's result line + series without losing focus
+  const card = inp.closest(".game");
+  const res = gameResultText(games[Number(inp.dataset.g)]);
+  const line = card.querySelector(".game-result");
+  line.textContent = res.text;
+  line.classList.toggle("win", res.win);
+  renderSeries();
+});
+
+gamesEl.addEventListener("click", (e) => {
+  const rm = e.target.dataset.remove;
+  if (rm === undefined) return;
+  games.splice(Number(rm), 1);
+  if (games.length === 0) games = [blankGame()];
+  save();
+  render();
+});
+
+document.getElementById("add-game").addEventListener("click", () => {
+  games.push(blankGame());
+  save();
+  render();
+});
+
+document.getElementById("reset-all").addEventListener("click", () => {
+  if (!confirm("Clear all scores and start fresh?")) return;
+  games = [blankGame()];
+  save();
+  render();
+});
+
+document.getElementById("copy-result").addEventListener("click", async () => {
+  const lines = [`🏏 Match 2 Scorecard`, `🦅 ${TEAM_A} vs ${TEAM_B} ⚡`, ``];
+  games.forEach((g, i) => {
+    const eScore = g.eR === "" ? "–" : `${g.eR}${g.eW !== "" ? "/" + g.eW : ""}${g.eO !== "" ? " (" + g.eO + ")" : ""}`;
+    const sScore = g.sR === "" ? "–" : `${g.sR}${g.sW !== "" ? "/" + g.sW : ""}${g.sO !== "" ? " (" + g.sO + ")" : ""}`;
+    const res = gameResultText(g);
+    lines.push(`Game ${i + 1}: Eagles ${eScore} | Strikers ${sScore}`);
+    if (res.win) lines.push(`   → ${res.text}`);
+  });
+  lines.push(``);
+  lines.push(document.getElementById("series-verdict").textContent + ` (${document.getElementById("series-score").textContent})`);
+  const text = lines.join("\n");
+  try { await navigator.clipboard.writeText(text); }
+  catch { /* fallback below */ }
+  document.getElementById("copy-status").textContent = "Result copied — paste it in the group ✅";
+  setTimeout(() => { document.getElementById("copy-status").textContent = ""; }, 3000);
+});
+
+render();
+</script>
+</body>
+</html>
