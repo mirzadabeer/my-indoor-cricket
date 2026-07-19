@@ -6,6 +6,29 @@
 <title>Tournament Awards — Match 2</title>
 <link rel="stylesheet" href="assets/style.css">
 <style>
+  .champions {
+    text-align: center;
+    padding: 22px 20px;
+    border: 2px solid var(--gold);
+    background: linear-gradient(180deg, rgba(205,163,73,0.14), transparent);
+  }
+  .champ-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .champ-name {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    font-size: 30px;
+    letter-spacing: 0.03em;
+    color: var(--crease-white);
+    margin: 6px 0 2px;
+  }
+  .champ-sub { font-family: var(--font-mono); font-size: 11px; color: var(--stump-tan); letter-spacing: 0.1em; }
+
   .award-card { text-align: center; padding-top: 22px; }
   .award-icon { font-size: 46px; line-height: 1; }
   .award-title {
@@ -59,24 +82,30 @@
     <p class="match-tag">Arabian Eagles 🦅 vs Desert Strikers ⚡ · Sat 18 July</p>
   </div>
 
+  <div class="card champions">
+    <div class="champ-label">🏆 Champions</div>
+    <div class="champ-name">⚡ Desert Strikers</div>
+    <div class="champ-sub">Winners · Match 2</div>
+  </div>
+
   <div class="card award-card">
     <div class="award-icon">🏏</div>
     <div class="award-title">Best Batsman</div>
-    <div class="award-name empty" id="bat-name">To be announced</div>
+    <div class="award-name" id="bat-name">Anush</div>
     <div class="award-team" id="bat-team"></div>
   </div>
 
   <div class="card award-card">
     <div class="award-icon">🎯</div>
     <div class="award-title">Best Bowler</div>
-    <div class="award-name empty" id="bowl-name">To be announced</div>
+    <div class="award-name" id="bowl-name">Vaseem Bhaiya</div>
     <div class="award-team" id="bowl-team"></div>
   </div>
 
   <div class="card award-card">
     <div class="award-icon">⭐</div>
-    <div class="award-title">Man of the Match</div>
-    <div class="award-name empty" id="motm-name">To be announced</div>
+    <div class="award-title">Man of the Match / Series</div>
+    <div class="award-name" id="motm-name">Zeeshan Bhaiya</div>
     <div class="award-team" id="motm-team"></div>
   </div>
 
@@ -126,12 +155,23 @@ Object.entries(ROSTER).forEach(([team, players]) => players.forEach((p) => (PLAY
 const AWARDS = [
   { key: "bat", label: "Best Batsman", icon: "🏏" },
   { key: "bowl", label: "Best Bowler", icon: "🎯" },
-  { key: "motm", label: "Man of the Match", icon: "⭐" },
+  { key: "motm", label: "Man of the Match / Series", icon: "⭐" },
 ];
 
+// Final Match 2 results (baked in so everyone sees them on the live site)
+const DEFAULT_AWARDS = {
+  bat: { name: "Anush", note: "" },
+  bowl: { name: "Vaseem Bhaiya", note: "" },
+  motm: { name: "Zeeshan Bhaiya", note: "" },
+};
+const CHAMPIONS = "Desert Strikers";
+
 function load() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; }
-  catch { return {}; }
+  try {
+    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (stored && Object.keys(stored).length) return stored;
+  } catch {}
+  return { ...DEFAULT_AWARDS };
 }
 let data = load();
 
@@ -189,7 +229,7 @@ document.getElementById("save-awards").addEventListener("click", () => {
 });
 
 document.getElementById("copy-awards").addEventListener("click", async () => {
-  const lines = ["🏆 TOURNAMENT AWARDS — Match 2", "🦅 Arabian Eagles vs Desert Strikers ⚡", ""];
+  const lines = ["🏆 TOURNAMENT AWARDS — Match 2", "🦅 Arabian Eagles vs Desert Strikers ⚡", "", `🏆 Champions: ${CHAMPIONS} ⚡`, ""];
   AWARDS.forEach((a) => {
     const rec = data[a.key];
     if (rec && rec.name) {
